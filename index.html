@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Thumbnail Downloader</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="logo">Download Youtube Thumbnail</div>
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="#" class="nav-link">Posts</a>
+        <a href="privacy-policy.html" class="nav-link">Privacy Policy</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    <div class="container">
+      <section class="hero">
+        <p class="hero-subtitle">Download youtube and vimeo thumbnail images of all quality for free. This application let you download thumbnails of all quality. Just paste the URL of the thumbnail video in the below input and click Get Thumbnail Image</p>
+        <form id="thumbnail-form" class="thumbnail-form">
+          <input type="url" id="video-url" class="url-input" placeholder="Paste YouTube video URL here" required />
+          <button type="submit" class="primary-button">Get Thumbnail Image</button>
+        </form>
+        <p class="help-text">Paste any YouTube link, then right click on an image and choose "Save image as..." to download.</p>
+        <p id="error-message" class="error-message" aria-live="polite"></p>
+      </section>
+
+      <section id="thumbnails" class="thumbnails" aria-live="polite"></section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-text">Not affiliated with YouTube or Google.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
