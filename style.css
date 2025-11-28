@@ -371,6 +371,10 @@ body {
 
   .url-input {
     width: 100%;
+    padding: 0.9rem 1rem;
+    font-size: 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.75rem;
   }
 
   .primary-button {
