@@ -31,6 +31,31 @@
         <p id="error-message" class="error-message" aria-live="polite"></p>
       </section>
 
+      <section class="hero">
+        <p class="hero-subtitle">Batch download thumbnails for multiple YouTube videos at once. Paste one URL or video ID per line.</p>
+        <div class="thumbnail-form">
+          <textarea id="batch-input" class="url-input" rows="4" placeholder="Paste multiple YouTube URLs or IDs here, one per line"></textarea>
+        </div>
+        <div class="thumbnail-form">
+          <select id="batch-resolution" class="url-input">
+            <option value="maxresdefault.jpg">HD (maxresdefault)</option>
+            <option value="sddefault.jpg">SD (sddefault)</option>
+            <option value="hqdefault.jpg">HQ (hqdefault)</option>
+            <option value="mqdefault.jpg">MQ (mqdefault)</option>
+            <option value="default.jpg">Small (default)</option>
+          </select>
+          <label class="help-text">
+            <input type="checkbox" id="batch-fallback" checked />
+            Fallback if selected size is not available
+          </label>
+        </div>
+        <div class="thumbnail-form">
+          <input type="text" id="batch-filename-pattern" class="url-input" value="{index}-{id}-{size}.jpg" />
+          <button type="button" id="batch-download-zip" class="primary-button">Download ZIP</button>
+        </div>
+        <p id="batch-status" class="help-text" aria-live="polite"></p>
+      </section>
+
       <section id="thumbnails" class="thumbnails" aria-live="polite"></section>
 
     </div>

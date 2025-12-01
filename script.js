@@ -2,6 +2,12 @@ var form = document.getElementById("thumbnail-form");
 var input = document.getElementById("video-url");
 var thumbnailsContainer = document.getElementById("thumbnails");
 var errorMessage = document.getElementById("error-message");
+var batchInput = document.getElementById("batch-input");
+var batchResolution = document.getElementById("batch-resolution");
+var batchFallback = document.getElementById("batch-fallback");
+var batchFileNamePattern = document.getElementById("batch-filename-pattern");
+var batchDownloadButton = document.getElementById("batch-download-zip");
+var batchStatus = document.getElementById("batch-status");
 
 function extractYouTubeId(value) {
   if (!value) {
@@ -68,6 +74,117 @@ function buildThumbnails(videoId) {
   thumbnailsContainer.innerHTML = html;
 }
 
+function parseBatchInput(text) {
+  var lines = (text || "").split(/\r?\n/);
+  var validIds = [];
+  var invalidLines = [];
+  for (var i = 0; i < lines.length; i++) {
+    var raw = lines[i];
+    if (!raw) {
+      continue;
+    }
+    var trimmed = raw.trim();
+    if (!trimmed) {
+      continue;
+    }
+    var id = extractYouTubeId(trimmed);
+    if (id) {
+      validIds.push(id);
+    } else {
+      invalidLines.push(trimmed);
+    }
+  }
+  return {
+    validIds: validIds,
+    invalidLines: invalidLines
+  };
+}
+
+function buildBatchStatusMessage(validCount, invalidCount) {
+  if (validCount === 0 && invalidCount === 0) {
+    return "";
+  }
+  var parts = [];
+  if (validCount > 0) {
+    parts.push("Parsed " + validCount + " valid video" + (validCount > 1 ? "s" : ""));
+  }
+  if (invalidCount > 0) {
+    parts.push(invalidCount + " line" + (invalidCount > 1 ? "s" : "") + " could not be parsed");
+  }
+  return parts.join(". ");
+}
+
+function handleBatchDownloadClick() {
+  if (!batchInput || !batchDownloadButton || !batchStatus) {
+    return;
+  }
+
+  var text = batchInput.value || "";
+  var parsed = parseBatchInput(text);
+
+  if (parsed.validIds.length === 0) {
+    batchStatus.textContent = "Please enter at least one valid YouTube URL or ID (one per line).";
+    return;
+  }
+
+  var resolution = batchResolution && batchResolution.value ? batchResolution.value : "maxresdefault.jpg";
+  var fallback = batchFallback ? !!batchFallback.checked : true;
+  var pattern = batchFileNamePattern && batchFileNamePattern.value ? batchFileNamePattern.value : "{index}-{id}-{size}.jpg";
+
+  var items = parsed.validIds.map(function (id) {
+    return { id: id };
+  });
+
+  batchDownloadButton.disabled = true;
+  batchDownloadButton.textContent = "Preparing ZIP...";
+  batchStatus.textContent = buildBatchStatusMessage(parsed.validIds.length, parsed.invalidLines.length) || "Preparing download...";
+
+  fetch("/api/zip-thumbnails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      items: items,
+      resolution: resolution,
+      fallback: fallback,
+      fileNamePattern: pattern
+    })
+  })
+    .then(function (response) {
+      if (!response.ok) {
+        return response
+          .json()
+          .catch(function () {
+            return {};
+          })
+          .then(function (data) {
+            var message = data && data.error ? data.error : "Failed to generate ZIP.";
+            throw new Error(message);
+          });
+      }
+      return response.blob();
+    })
+    .then(function (blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "thumbnails-batch.zip";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      batchStatus.textContent = "ZIP download started for " + parsed.validIds.length + " video" + (parsed.validIds.length > 1 ? "s" : "") + ".";
+      batchDownloadButton.disabled = false;
+      batchDownloadButton.textContent = "Download ZIP";
+    })
+    .catch(function (error) {
+      batchStatus.textContent = (error && error.message) || "Failed to download ZIP.";
+      batchDownloadButton.disabled = false;
+      batchDownloadButton.textContent = "Download ZIP";
+    });
+}
+
 function handleSubmit(event) {
   event.preventDefault();
   errorMessage.textContent = "";
@@ -83,4 +200,8 @@ function handleSubmit(event) {
 
 if (form) {
   form.addEventListener("submit", handleSubmit);
+}
+
+if (batchDownloadButton) {
+  batchDownloadButton.addEventListener("click", handleBatchDownloadClick);
 }

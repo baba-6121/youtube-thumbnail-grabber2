@@ -1,0 +1,9 @@
+{
+  "name": "youtube-thumbnail-grabber2",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "node-fetch": "^2.6.7"
+  }
+}
