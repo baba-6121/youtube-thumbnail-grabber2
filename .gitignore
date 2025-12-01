@@ -24,3 +24,6 @@ Thumbs.db
 coverage/
 .dist/
 .out/
+
+# markdown
+*.md
