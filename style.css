@@ -524,7 +524,7 @@ body {
     display: block; 
     width: 100%;
     height: 2.5rem; 
-    line-height: 2.5rem; 
+    line-height: 1.2rem; 
     
     /* 覆盖掉桌面端的高 padding，解决高度过高问题 */
     padding: 0 0.9rem;
