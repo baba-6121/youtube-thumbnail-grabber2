@@ -10,6 +10,15 @@ var batchDownloadButton = document.getElementById("batch-download-zip");
 var batchStatus = document.getElementById("batch-status");
 var modeTabs = document.querySelectorAll(".mode-tab");
 var modePanels = document.querySelectorAll(".mode-panel");
+var batchPreviewButton = document.getElementById("batch-preview-btn");
+var batchDownloadCurrentButton = document.getElementById("batch-download-current");
+var batchPreview = document.getElementById("batch-preview");
+var batchPreviewThumbnails = document.getElementById("batch-preview-thumbnails");
+var batchPreviewLabel = document.getElementById("batch-preview-label");
+var batchPrevButton = document.getElementById("batch-prev");
+var batchNextButton = document.getElementById("batch-next");
+var batchPreviewIds = [];
+var batchPreviewIndex = 0;
 
 function extractYouTubeId(value) {
   if (!value) {
@@ -48,7 +57,10 @@ function extractYouTubeId(value) {
   return null;
 }
 
-function buildThumbnails(videoId) {
+function renderThumbnailsInto(videoId, target) {
+  if (!target) {
+    return;
+  }
   var base = "https://img.youtube.com/vi/" + videoId + "/";
   var sizes = [
     { key: "maxresdefault.jpg", label: "HD Thumbnail", size: "1280x720" },
@@ -74,7 +86,11 @@ function buildThumbnails(videoId) {
       "</article>"
     );
   }).join("");
-  thumbnailsContainer.innerHTML = html;
+  target.innerHTML = html;
+}
+
+function buildThumbnails(videoId) {
+  renderThumbnailsInto(videoId, thumbnailsContainer);
 }
 
 function setActiveMode(mode) {
@@ -104,6 +120,14 @@ function setActiveMode(mode) {
     } else {
       panel.classList.remove("is-active");
       panel.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  if (thumbnailsContainer) {
+    if (targetMode === "single") {
+      thumbnailsContainer.style.display = "";
+    } else {
+      thumbnailsContainer.style.display = "none";
     }
   }
 }
@@ -149,16 +173,66 @@ function buildBatchStatusMessage(validCount, invalidCount) {
   }
   var parts = [];
   if (validCount > 0) {
-    parts.push("Parsed " + validCount + " valid video" + (validCount > 1 ? "s" : ""));
+    parts.push(validCount + " valid video" + (validCount > 1 ? "s" : ""));
   }
   if (invalidCount > 0) {
-    parts.push(invalidCount + " line" + (invalidCount > 1 ? "s" : "") + " could not be parsed");
+    parts.push(invalidCount + " invalid line" + (invalidCount > 1 ? "s" : ""));
   }
-  return parts.join(". ");
+  return parts.join(" · ");
 }
 
-function handleBatchDownloadClick() {
-  if (!batchInput || !batchDownloadButton || !batchStatus) {
+function updateBatchPreview() {
+  if (!batchPreview || !batchPreviewThumbnails) {
+    return;
+  }
+  if (!batchPreviewIds.length) {
+    batchPreview.style.display = "none";
+    batchPreview.setAttribute("aria-hidden", "true");
+    batchPreviewThumbnails.innerHTML = "";
+    if (batchPreviewLabel) {
+      batchPreviewLabel.textContent = "";
+    }
+    return;
+  }
+
+  if (batchPreviewIndex < 0) {
+    batchPreviewIndex = 0;
+  }
+  if (batchPreviewIndex >= batchPreviewIds.length) {
+    batchPreviewIndex = batchPreviewIds.length - 1;
+  }
+
+  var currentId = batchPreviewIds[batchPreviewIndex];
+
+  batchPreview.style.display = "block";
+  batchPreview.removeAttribute("aria-hidden");
+
+  if (batchPreviewLabel) {
+    batchPreviewLabel.textContent =
+      "Video " + (batchPreviewIndex + 1) + " of " + batchPreviewIds.length + " (ID: " + currentId + ")";
+  }
+
+  renderThumbnailsInto(currentId, batchPreviewThumbnails);
+}
+
+function handleBatchPrevClick() {
+  if (!batchPreviewIds.length) {
+    return;
+  }
+  batchPreviewIndex = (batchPreviewIndex - 1 + batchPreviewIds.length) % batchPreviewIds.length;
+  updateBatchPreview();
+}
+
+function handleBatchNextClick() {
+  if (!batchPreviewIds.length) {
+    return;
+  }
+  batchPreviewIndex = (batchPreviewIndex + 1) % batchPreviewIds.length;
+  updateBatchPreview();
+}
+
+function handleBatchPreviewClick() {
+  if (!batchInput || !batchStatus) {
     return;
   }
 
@@ -167,6 +241,29 @@ function handleBatchDownloadClick() {
 
   if (parsed.validIds.length === 0) {
     batchStatus.textContent = "Please enter at least one valid YouTube URL or ID (one per line).";
+    batchPreviewIds = [];
+    batchPreviewIndex = 0;
+    updateBatchPreview();
+    return;
+  }
+
+  batchPreviewIds = parsed.validIds.slice();
+  batchPreviewIndex = 0;
+  var statusText = buildBatchStatusMessage(parsed.validIds.length, parsed.invalidLines.length);
+  if (parsed.invalidLines.length > 0) {
+    var examples = parsed.invalidLines.slice(0, 3).join(" | ");
+    statusText += " (e.g. " + examples + ")";
+  }
+  batchStatus.textContent = statusText;
+  updateBatchPreview();
+}
+
+function performZipDownloadForIds(idList, triggerButton) {
+  if (!triggerButton || !batchStatus) {
+    return;
+  }
+  if (!idList || !idList.length) {
+    batchStatus.textContent = "Nothing to download. Please click \"Preview thumbnails\" first.";
     return;
   }
 
@@ -174,13 +271,16 @@ function handleBatchDownloadClick() {
   var fallback = batchFallback ? !!batchFallback.checked : true;
   var pattern = batchFileNamePattern && batchFileNamePattern.value ? batchFileNamePattern.value : "{index}-{id}-{size}.jpg";
 
-  var items = parsed.validIds.map(function (id) {
+  var items = idList.map(function (id) {
     return { id: id };
   });
 
-  batchDownloadButton.disabled = true;
-  batchDownloadButton.textContent = "Preparing ZIP...";
-  batchStatus.textContent = buildBatchStatusMessage(parsed.validIds.length, parsed.invalidLines.length) || "Preparing download...";
+  var originalText = triggerButton.textContent;
+
+  triggerButton.disabled = true;
+  triggerButton.textContent = "Preparing ZIP...";
+  batchStatus.textContent =
+    "Preparing ZIP for " + idList.length + " video" + (idList.length > 1 ? "s" : "") + "...";
 
   fetch("/api/zip-thumbnails", {
     method: "POST",
@@ -217,15 +317,37 @@ function handleBatchDownloadClick() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      batchStatus.textContent = "ZIP download started for " + parsed.validIds.length + " video" + (parsed.validIds.length > 1 ? "s" : "") + ".";
-      batchDownloadButton.disabled = false;
-      batchDownloadButton.textContent = "Download ZIP";
+      batchStatus.textContent =
+        "ZIP download started for " + idList.length + " video" + (idList.length > 1 ? "s" : "") + ".";
+      triggerButton.disabled = false;
+      triggerButton.textContent = originalText;
     })
     .catch(function (error) {
       batchStatus.textContent = (error && error.message) || "Failed to download ZIP.";
-      batchDownloadButton.disabled = false;
-      batchDownloadButton.textContent = "Download ZIP";
+      triggerButton.disabled = false;
+      triggerButton.textContent = originalText;
     });
+}
+
+function handleBatchDownloadCurrentClick() {
+  if (!batchPreviewIds.length) {
+    if (batchStatus) {
+      batchStatus.textContent = "Please click \"Preview thumbnails\" first.";
+    }
+    return;
+  }
+  var currentId = batchPreviewIds[batchPreviewIndex] || batchPreviewIds[0];
+  performZipDownloadForIds([currentId], batchDownloadCurrentButton || batchDownloadButton);
+}
+
+function handleBatchDownloadAllClick() {
+  if (!batchPreviewIds.length) {
+    if (batchStatus) {
+      batchStatus.textContent = "Please click \"Preview thumbnails\" first.";
+    }
+    return;
+  }
+  performZipDownloadForIds(batchPreviewIds.slice(), batchDownloadButton);
 }
 
 function handleSubmit(event) {
@@ -245,8 +367,24 @@ if (form) {
   form.addEventListener("submit", handleSubmit);
 }
 
+if (batchPreviewButton) {
+  batchPreviewButton.addEventListener("click", handleBatchPreviewClick);
+}
+
+if (batchDownloadCurrentButton) {
+  batchDownloadCurrentButton.addEventListener("click", handleBatchDownloadCurrentClick);
+}
+
 if (batchDownloadButton) {
-  batchDownloadButton.addEventListener("click", handleBatchDownloadClick);
+  batchDownloadButton.addEventListener("click", handleBatchDownloadAllClick);
+}
+
+if (batchPrevButton) {
+  batchPrevButton.addEventListener("click", handleBatchPrevClick);
+}
+
+if (batchNextButton) {
+  batchNextButton.addEventListener("click", handleBatchNextClick);
 }
 
 if (modeTabs && modeTabs.length) {

@@ -173,6 +173,31 @@ body {
   box-shadow: 0 8px 18px rgba(79, 70, 229, 0.3);
 }
 
+.secondary-button {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.secondary-button:hover {
+  background-color: #f3f4f6;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+.secondary-button:active {
+  background-color: #e5e7eb;
+  box-shadow: none;
+}
+
 .help-text {
   font-size: 0.85rem;
   color: #6b7280;
@@ -190,6 +215,26 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.batch-preview {
+  display: none;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.batch-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.batch-preview-header .help-text {
+  flex: 1;
+  text-align: center;
 }
 
 .thumbnail-card {

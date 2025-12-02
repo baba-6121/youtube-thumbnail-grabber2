@@ -11,7 +11,8 @@ const ALLOWED_SIZES = [
 module.exports = async (req, res) => {
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
-    res.status(405).send("Method Not Allowed");
+    console.warn("[download-thumbnail] Method not allowed", { method: req.method });
+    res.status(405).json({ error: "Method Not Allowed", code: "method_not_allowed" });
     return;
   }
 
@@ -20,7 +21,8 @@ module.exports = async (req, res) => {
   const sizeParam = typeof query.size === "string" ? query.size : "maxresdefault.jpg";
 
   if (!id) {
-    res.status(400).json({ error: "Missing 'id' query parameter" });
+    console.warn("[download-thumbnail] Missing id query parameter", { query });
+    res.status(400).json({ error: "Missing 'id' query parameter", code: "missing_id" });
     return;
   }
 
@@ -30,7 +32,16 @@ module.exports = async (req, res) => {
   try {
     const response = await fetch(url);
     if (!response.ok) {
-      res.status(response.status).json({ error: "Failed to fetch thumbnail" });
+      console.error("[download-thumbnail] Upstream thumbnail fetch failed", {
+        id,
+        size,
+        status: response.status
+      });
+      res.status(response.status).json({
+        error: "Failed to fetch thumbnail from YouTube",
+        code: "upstream_error",
+        status: response.status
+      });
       return;
     }
 
@@ -42,6 +53,11 @@ module.exports = async (req, res) => {
     res.setHeader("Content-Disposition", `attachment; filename=\"${filename}\"`);
     res.status(200).send(buffer);
   } catch (e) {
-    res.status(500).json({ error: "Failed to download thumbnail" });
+    console.error("[download-thumbnail] Failed to download thumbnail", {
+      id,
+      size,
+      error: e && e.message ? e.message : String(e)
+    });
+    res.status(500).json({ error: "Failed to download thumbnail", code: "download_error" });
   }
 };

@@ -40,11 +40,21 @@ async function fetchImageWithFallback(id, preferredSize, useFallback) {
         if (response.status === 404) {
           continue;
         }
+        console.error("[zip-thumbnails] Upstream thumbnail fetch failed", {
+          id,
+          size,
+          status: response.status
+        });
         continue;
       }
       const buffer = await response.buffer();
       return { id, size, buffer };
     } catch (e) {
+      console.error("[zip-thumbnails] Error while fetching thumbnail", {
+        id,
+        size,
+        error: e && e.message ? e.message : String(e)
+      });
       continue;
     }
   }
@@ -95,7 +105,7 @@ function buildFileName(pattern, index, id, size) {
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
-    res.status(405).send("Method Not Allowed");
+    res.status(405).json({ error: "Method Not Allowed", code: "method_not_allowed" });
     return;
   }
 
@@ -104,7 +114,10 @@ module.exports = async (req, res) => {
     try {
       body = JSON.parse(body);
     } catch (e) {
-      res.status(400).json({ error: "Invalid JSON body" });
+      console.error("[zip-thumbnails] Invalid JSON body", {
+        bodySnippet: body.slice && body.slice(0, 200)
+      });
+      res.status(400).json({ error: "Invalid JSON body", code: "invalid_json" });
       return;
     }
   }
@@ -116,17 +129,26 @@ module.exports = async (req, res) => {
   const fileNamePattern = body.fileNamePattern;
 
   if (items.length === 0) {
-    res.status(400).json({ error: "'items' must be a non-empty array" });
+    console.warn("[zip-thumbnails] Empty items array in request body");
+    res.status(400).json({ error: "'items' must be a non-empty array", code: "items_empty" });
     return;
   }
 
   if (items.length > MAX_ITEMS) {
-    res.status(400).json({ error: `Too many items. Maximum allowed is ${MAX_ITEMS}.` });
+    console.warn("[zip-thumbnails] Too many items in request", {
+      count: items.length,
+      max: MAX_ITEMS
+    });
+    res.status(400).json({
+      error: `Too many items. Maximum allowed is ${MAX_ITEMS}.`,
+      code: "too_many_items"
+    });
     return;
   }
 
   if (!ALLOWED_SIZES.includes(resolution)) {
-    res.status(400).json({ error: "Invalid resolution" });
+    console.warn("[zip-thumbnails] Invalid resolution in request", { resolution });
+    res.status(400).json({ error: "Invalid resolution", code: "invalid_resolution" });
     return;
   }
 
@@ -153,8 +175,32 @@ module.exports = async (req, res) => {
   const successful = downloaded.filter(Boolean);
 
   if (successful.length === 0) {
-    res.status(500).json({ error: "Failed to download thumbnails for all items" });
+    console.error("[zip-thumbnails] Failed to download thumbnails for all items", {
+      ids: items.map(item => (item && typeof item.id === "string" ? item.id : "")),
+      resolution,
+      fallback
+    });
+    res.status(502).json({
+      error: "Failed to download thumbnails from YouTube for all requested videos.",
+      code: "download_failed_all"
+    });
     return;
+  }
+
+  const failedIds = items
+    .map((item, index) => ({
+      id: item && typeof item.id === "string" ? item.id : "",
+      result: downloaded[index]
+    }))
+    .filter(entry => entry.id && !entry.result)
+    .map(entry => entry.id);
+
+  if (failedIds.length > 0) {
+    console.warn("[zip-thumbnails] Some thumbnails could not be downloaded", {
+      failedIds,
+      resolution,
+      fallback
+    });
   }
 
   const zip = new JSZip();
@@ -172,6 +218,9 @@ module.exports = async (req, res) => {
     res.setHeader("Content-Disposition", `attachment; filename=\"${fileName}\"`);
     res.status(200).send(zipBuffer);
   } catch (e) {
-    res.status(500).json({ error: "Failed to generate zip" });
+    console.error("[zip-thumbnails] Failed to generate ZIP", {
+      error: e && e.message ? e.message : String(e)
+    });
+    res.status(500).json({ error: "Failed to generate zip", code: "zip_generation_failed" });
   }
 };

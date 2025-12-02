@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Youtube thumbnail Image View and Download</title>
-  <meta name="description" content="Download youtube thumbnail Images and vimeo videos of all quality. This app lets you to download HD thumbnail images for free. Just enter the URL of the video for which thumbnail needs to be saved." />
+  <title>Download YouTube Thumbnails (Single &amp; Batch)</title>
+  <meta name="description" content="Download YouTube video thumbnails in all sizes. Paste a YouTube link for a single video, or use batch mode to preview and download many thumbnails as a ZIP." />
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RKMBRQH82X"></script>
   <script>
@@ -19,7 +19,7 @@
 <body>
   <header class="site-header">
     <div class="container header-inner">
-      <div class="logo">Download Youtube Thumbnail</div>
+      <div class="logo">Download YouTube Thumbnails</div>
       <nav class="nav-links">
         <a href="index.html" class="nav-link">Home</a>
         <a href="#" class="nav-link">Posts</a>
@@ -68,9 +68,19 @@
           </div>
           <div class="thumbnail-form">
             <input type="text" id="batch-filename-pattern" class="url-input" value="{index}-{id}-{size}.jpg" />
-            <button type="button" id="batch-download-zip" class="primary-button">Download ZIP</button>
+            <button type="button" id="batch-preview-btn" class="primary-button">Preview thumbnails</button>
+            <button type="button" id="batch-download-current" class="primary-button">Download current ZIP</button>
+            <button type="button" id="batch-download-zip" class="primary-button">Download all ZIPs</button>
           </div>
           <p id="batch-status" class="help-text" aria-live="polite"></p>
+          <div id="batch-preview" class="batch-preview" aria-hidden="true">
+            <div class="batch-preview-header">
+              <button type="button" id="batch-prev" class="secondary-button">Prev</button>
+              <span id="batch-preview-label" class="help-text"></span>
+              <button type="button" id="batch-next" class="secondary-button">Next</button>
+            </div>
+            <div id="batch-preview-thumbnails" class="thumbnails"></div>
+          </div>
         </div>
       </section>
 
