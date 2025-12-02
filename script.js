@@ -8,6 +8,8 @@ var batchFallback = document.getElementById("batch-fallback");
 var batchFileNamePattern = document.getElementById("batch-filename-pattern");
 var batchDownloadButton = document.getElementById("batch-download-zip");
 var batchStatus = document.getElementById("batch-status");
+var modeTabs = document.querySelectorAll(".mode-tab");
+var modePanels = document.querySelectorAll(".mode-panel");
 
 function extractYouTubeId(value) {
   if (!value) {
@@ -72,6 +74,46 @@ function buildThumbnails(videoId) {
     );
   }).join("");
   thumbnailsContainer.innerHTML = html;
+}
+
+function setActiveMode(mode) {
+  var targetMode = mode || "single";
+  for (var i = 0; i < modeTabs.length; i++) {
+    var tab = modeTabs[i];
+    var tabMode = tab.getAttribute("data-mode");
+    var isActive = tabMode === targetMode;
+    if (isActive) {
+      tab.classList.add("is-active");
+      tab.setAttribute("aria-selected", "true");
+      tab.removeAttribute("tabindex");
+    } else {
+      tab.classList.remove("is-active");
+      tab.setAttribute("aria-selected", "false");
+      tab.setAttribute("tabindex", "-1");
+    }
+  }
+
+  for (var j = 0; j < modePanels.length; j++) {
+    var panel = modePanels[j];
+    var panelMode = panel.getAttribute("data-panel");
+    var panelActive = panelMode === targetMode;
+    if (panelActive) {
+      panel.classList.add("is-active");
+      panel.removeAttribute("aria-hidden");
+    } else {
+      panel.classList.remove("is-active");
+      panel.setAttribute("aria-hidden", "true");
+    }
+  }
+}
+
+function handleModeTabClick(event) {
+  var button = event.currentTarget;
+  var mode = button && button.getAttribute("data-mode");
+  if (!mode) {
+    return;
+  }
+  setActiveMode(mode);
 }
 
 function parseBatchInput(text) {
@@ -204,4 +246,11 @@ if (form) {
 
 if (batchDownloadButton) {
   batchDownloadButton.addEventListener("click", handleBatchDownloadClick);
+}
+
+if (modeTabs && modeTabs.length) {
+  setActiveMode("single");
+  for (var i = 0; i < modeTabs.length; i++) {
+    modeTabs[i].addEventListener("click", handleModeTabClick);
+  }
 }
