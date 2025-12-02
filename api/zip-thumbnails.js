@@ -90,10 +90,8 @@ async function runWithConcurrency(tasks, limit) {
   return results;
 }
 
-function buildFileName(pattern, index, id, size) {
-  const basePattern = typeof pattern === "string" && pattern.trim()
-    ? pattern.trim()
-    : "{index}-{id}-{size}.jpg";
+function buildFileName(index, id, size) {
+  const basePattern = "{index}-{id}-{size}.jpg";
   const indexStr = String(index).padStart(3, "0");
   const sizeKey = size.replace(/\.jpg$/i, "");
   return basePattern
@@ -129,7 +127,6 @@ module.exports = async (req, res) => {
     : [];
   const resolution = typeof body.resolution === "string" ? body.resolution : "maxresdefault.jpg";
   const fallback = Boolean(body.fallback);
-  const fileNamePattern = body.fileNamePattern;
 
   if (items.length === 0) {
     console.warn("[zip-thumbnails] Empty items array in request body");
@@ -228,7 +225,7 @@ module.exports = async (req, res) => {
 
   const zip = new JSZip();
   successful.forEach(item => {
-    const fileName = buildFileName(fileNamePattern, item.index, item.id, item.size);
+    const fileName = buildFileName(item.index, item.id, item.size);
     zip.file(fileName, item.buffer);
   });
 

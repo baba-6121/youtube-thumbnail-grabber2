@@ -52,7 +52,7 @@ body {
   font-size: 0.875rem;
   color: #4b5563;
   text-decoration: none;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.7rem;
   border-radius: 999px;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
@@ -60,6 +60,22 @@ body {
 .nav-link:hover {
   background-color: #eef2ff;
   color: #4338ca;
+}
+
+.nav-link.is-current {
+  background-color: transparent;
+  color: #111827;
+  font-weight: 600;
+  cursor: default;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-decoration-color: #4f46e5;
+}
+
+.nav-link.is-current:hover {
+  background-color: transparent;
+  color: #111827;
 }
 
 .site-main {
@@ -79,13 +95,13 @@ body {
   font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .hero-subtitle {
   font-size: 0.975rem;
   color: #4b5563;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .mode-tabs {
@@ -93,7 +109,7 @@ body {
   padding: 0.15rem;
   border-radius: 999px;
   background-color: #eef2ff;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .mode-tab {
@@ -159,6 +175,22 @@ body {
   box-shadow: 0 0 0 1px #4f46e533, 0 0 0 4px #e0e7ff;
 }
 
+#video-url {
+  background-color: #f9fafb;
+  border-width: 2px;
+  border-color: #e5e7eb;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+#video-url::placeholder {
+  color: #9ca3af;
+}
+
+#video-url:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 1px #4f46e5, 0 0 0 4px #e0e7ff;
+}
+
 .primary-button {
   padding: 0.7rem 1.4rem;
   border-radius: 999px;
@@ -217,11 +249,25 @@ body {
   color: #6b7280;
 }
 
+.step-label {
+  font-size: 0.85rem;
+  color: #4b5563;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
 .error-message {
   font-size: 0.85rem;
-  color: #b91c1c;
+  color: #dc2626;
+  margin-top: 0.75rem;
+  min-height: 1.1em;
+}
+
+#batch-status {
   margin-top: 0.5rem;
-  min-height: 1em;
+  min-height: 1.1em;
+  color: #4b5563;
 }
 
 .thumbnails {
@@ -244,6 +290,10 @@ body {
   justify-content: space-between;
   gap: 0.75rem;
   margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
 }
 
 .batch-preview-header .help-text {
@@ -252,11 +302,11 @@ body {
 }
 
 .thumbnail-card {
-  background-color: transparent;
-  border-radius: 0;
-  border: none;
-  padding: 0;
-  box-shadow: none;
+  background-color: #f9fafb;
+  border-radius: 0.9rem;
+  border: 1px solid #e5e7eb;
+  padding: 1rem 1rem 1.1rem;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -279,10 +329,10 @@ body {
 }
 
 .thumbnail-image-wrapper {
-  border-radius: 0;
-  overflow: visible;
-  border: none;
-  background-color: transparent;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background-color: #111827;
   text-align: center;
 }
 
@@ -476,13 +526,13 @@ body {
   }
 
    .thumbnails {
-     margin-top: 1.5rem;
-     gap: 1rem;
-   }
+    margin-top: 1.5rem;
+    gap: 1.25rem;
+  }
 
-   .thumbnail-card {
-     padding: 0.875rem;
-   }
+  .thumbnail-card {
+    padding: 1rem;
+  }
 
    .policy-article {
      max-width: 100%;

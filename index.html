@@ -21,7 +21,7 @@
     <div class="container header-inner">
       <div class="logo">Download YouTube Thumbnails</div>
       <nav class="nav-links">
-        <a href="index.html" class="nav-link">Home</a>
+        <a href="index.html" class="nav-link is-current">Home</a>
         <a href="#" class="nav-link">Posts</a>
         <a href="privacy-policy.html" class="nav-link">Privacy Policy</a>
       </nav>
@@ -49,10 +49,11 @@
         </div>
 
         <div class="mode-panel" data-panel="batch" role="tabpanel" aria-label="Batch download mode" aria-hidden="true">
-          <p class="help-text">Batch download thumbnails for multiple YouTube videos at once. Paste one URL or video ID per line.</p>
+          <p class="help-text step-label"><strong>Step 1:</strong> Paste multiple YouTube URLs or IDs here, one per line.</p>
           <div class="thumbnail-form">
             <textarea id="batch-input" class="url-input" rows="4" placeholder="Paste multiple YouTube URLs or IDs here, one per line"></textarea>
           </div>
+          <p class="help-text step-label"><strong>Step 2:</strong> Choose thumbnail sizes and options.</p>
           <div class="thumbnail-form">
             <div class="size-checkbox-group" id="batch-sizes">
               <label class="size-option">
@@ -83,8 +84,8 @@
               Fallback if selected size is not available
             </label>
           </div>
+          <p class="help-text step-label"><strong>Step 3:</strong> Preview thumbnails and download ZIP files.</p>
           <div class="thumbnail-form">
-            <input type="text" id="batch-filename-pattern" class="url-input" value="{index}-{id}-{size}.jpg" />
             <button type="button" id="batch-preview-btn" class="primary-button">Preview thumbnails</button>
             <button type="button" id="batch-download-current" class="primary-button">Download current ZIP</button>
             <button type="button" id="batch-download-zip" class="primary-button">Download all ZIPs</button>

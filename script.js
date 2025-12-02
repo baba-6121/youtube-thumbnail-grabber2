@@ -5,7 +5,6 @@ var errorMessage = document.getElementById("error-message");
 var batchInput = document.getElementById("batch-input");
 var batchSizeGroup = document.getElementById("batch-sizes");
 var batchFallback = document.getElementById("batch-fallback");
-var batchFileNamePattern = document.getElementById("batch-filename-pattern");
 var batchDownloadButton = document.getElementById("batch-download-zip");
 var batchStatus = document.getElementById("batch-status");
 var modeTabs = document.querySelectorAll(".mode-tab");
@@ -85,6 +84,7 @@ function renderThumbnailsInto(videoId, target, selectedSizes) {
       '<article class="thumbnail-card">' +
       '<div class="thumbnail-header">' +
       '<h3 class="thumbnail-title">' + item.label + ' Image (' + item.size + ")</h3>" +
+      '<p class="thumbnail-size">Resolution ' + item.size + ' · JPG</p>' +
       '<div class="thumbnail-actions">' +
       '<a class="download-link" href="' + downloadUrl + '">Download</a>' +
       "</div>" +
@@ -300,7 +300,6 @@ function performZipDownloadForIds(idList, triggerButton) {
 
   var resolution = sizes[0] || "maxresdefault.jpg";
   var fallback = batchFallback ? !!batchFallback.checked : true;
-  var pattern = batchFileNamePattern && batchFileNamePattern.value ? batchFileNamePattern.value : "{index}-{id}-{size}.jpg";
 
   var items = idList.map(function (id) {
     return { id: id };
@@ -322,8 +321,7 @@ function performZipDownloadForIds(idList, triggerButton) {
       items: items,
       resolution: resolution,
       sizes: sizes,
-      fallback: fallback,
-      fileNamePattern: pattern
+      fallback: fallback
     })
   })
     .then(function (response) {
