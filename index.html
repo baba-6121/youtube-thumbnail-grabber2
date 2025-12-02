@@ -54,13 +54,30 @@
             <textarea id="batch-input" class="url-input" rows="4" placeholder="Paste multiple YouTube URLs or IDs here, one per line"></textarea>
           </div>
           <div class="thumbnail-form">
-            <select id="batch-resolution" class="url-input">
-              <option value="maxresdefault.jpg">HD (maxresdefault)</option>
-              <option value="sddefault.jpg">SD (sddefault)</option>
-              <option value="hqdefault.jpg">HQ (hqdefault)</option>
-              <option value="mqdefault.jpg">MQ (mqdefault)</option>
-              <option value="default.jpg">Small (default)</option>
-            </select>
+            <div class="size-checkbox-group" id="batch-sizes">
+              <label class="size-option">
+                <input type="checkbox" value="maxresdefault.jpg" checked />
+                HD (maxresdefault)
+              </label>
+              <label class="size-option">
+                <input type="checkbox" value="sddefault.jpg" />
+                SD (sddefault)
+              </label>
+              <label class="size-option">
+                <input type="checkbox" value="hqdefault.jpg" />
+                HQ (hqdefault)
+              </label>
+              <label class="size-option">
+                <input type="checkbox" value="mqdefault.jpg" />
+                MQ (mqdefault)
+              </label>
+              <label class="size-option">
+                <input type="checkbox" value="default.jpg" />
+                Small (default)
+              </label>
+            </div>
+          </div>
+          <div class="thumbnail-form">
             <label class="help-text">
               <input type="checkbox" id="batch-fallback" checked />
               Fallback if selected size is not available

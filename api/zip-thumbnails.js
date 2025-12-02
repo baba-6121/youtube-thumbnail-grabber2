@@ -124,6 +124,9 @@ module.exports = async (req, res) => {
   body = body || {};
 
   const items = Array.isArray(body.items) ? body.items : [];
+  const rawSizes = Array.isArray(body.sizes)
+    ? body.sizes.filter(value => typeof value === "string")
+    : [];
   const resolution = typeof body.resolution === "string" ? body.resolution : "maxresdefault.jpg";
   const fallback = Boolean(body.fallback);
   const fileNamePattern = body.fileNamePattern;
@@ -145,30 +148,45 @@ module.exports = async (req, res) => {
     });
     return;
   }
+  let sizes = rawSizes.length ? Array.from(new Set(rawSizes)) : [];
 
-  if (!ALLOWED_SIZES.includes(resolution)) {
-    console.warn("[zip-thumbnails] Invalid resolution in request", { resolution });
-    res.status(400).json({ error: "Invalid resolution", code: "invalid_resolution" });
-    return;
+  if (sizes.length) {
+    const invalidSizes = sizes.filter(size => !ALLOWED_SIZES.includes(size));
+    if (invalidSizes.length) {
+      console.warn("[zip-thumbnails] Invalid sizes in request", { sizes, invalidSizes });
+      res.status(400).json({ error: "One or more requested sizes are invalid", code: "invalid_sizes" });
+      return;
+    }
+  } else {
+    if (!ALLOWED_SIZES.includes(resolution)) {
+      console.warn("[zip-thumbnails] Invalid resolution in request", { resolution });
+      res.status(400).json({ error: "Invalid resolution", code: "invalid_resolution" });
+      return;
+    }
+    sizes = [resolution];
   }
 
-  const tasks = items.map((item, index) => {
+  const tasks = [];
+  items.forEach((item) => {
     const id = item && typeof item.id === "string" ? item.id : "";
-    return async () => {
-      if (!id) {
-        return null;
-      }
-      const result = await fetchImageWithFallback(id, resolution, fallback);
-      if (!result) {
-        return null;
-      }
-      return {
-        id,
-        buffer: result.buffer,
-        size: result.size,
-        index: index + 1
-      };
-    };
+    sizes.forEach((requestedSize) => {
+      const taskIndex = tasks.length;
+      tasks.push(async () => {
+        if (!id) {
+          return null;
+        }
+        const result = await fetchImageWithFallback(id, requestedSize, fallback);
+        if (!result) {
+          return null;
+        }
+        return {
+          id,
+          buffer: result.buffer,
+          size: result.size,
+          index: taskIndex + 1
+        };
+      });
+    });
   });
 
   const downloaded = await runWithConcurrency(tasks, 5);
@@ -178,6 +196,7 @@ module.exports = async (req, res) => {
     console.error("[zip-thumbnails] Failed to download thumbnails for all items", {
       ids: items.map(item => (item && typeof item.id === "string" ? item.id : "")),
       resolution,
+      sizes,
       fallback
     });
     res.status(502).json({
@@ -187,18 +206,22 @@ module.exports = async (req, res) => {
     return;
   }
 
+  const successById = new Map();
+  successful.forEach(entry => {
+    if (entry && entry.id) {
+      successById.set(entry.id, true);
+    }
+  });
+
   const failedIds = items
-    .map((item, index) => ({
-      id: item && typeof item.id === "string" ? item.id : "",
-      result: downloaded[index]
-    }))
-    .filter(entry => entry.id && !entry.result)
-    .map(entry => entry.id);
+    .map(item => (item && typeof item.id === "string" ? item.id : ""))
+    .filter(id => id && !successById.get(id));
 
   if (failedIds.length > 0) {
     console.warn("[zip-thumbnails] Some thumbnails could not be downloaded", {
       failedIds,
       resolution,
+      sizes,
       fallback
     });
   }

@@ -3,7 +3,7 @@ var input = document.getElementById("video-url");
 var thumbnailsContainer = document.getElementById("thumbnails");
 var errorMessage = document.getElementById("error-message");
 var batchInput = document.getElementById("batch-input");
-var batchResolution = document.getElementById("batch-resolution");
+var batchSizeGroup = document.getElementById("batch-sizes");
 var batchFallback = document.getElementById("batch-fallback");
 var batchFileNamePattern = document.getElementById("batch-filename-pattern");
 var batchDownloadButton = document.getElementById("batch-download-zip");
@@ -57,7 +57,7 @@ function extractYouTubeId(value) {
   return null;
 }
 
-function renderThumbnailsInto(videoId, target) {
+function renderThumbnailsInto(videoId, target, selectedSizes) {
   if (!target) {
     return;
   }
@@ -69,7 +69,16 @@ function renderThumbnailsInto(videoId, target) {
     { key: "mqdefault.jpg", label: "Normal Thumbnail", size: "320x180" },
     { key: "default.jpg", label: "Small Thumbnail", size: "120x90" }
   ];
-  var html = sizes.map(function (item) {
+  var list = sizes;
+  if (selectedSizes && selectedSizes.length) {
+    list = sizes.filter(function (item) {
+      return selectedSizes.indexOf(item.key) !== -1;
+    });
+    if (!list.length) {
+      list = sizes;
+    }
+  }
+  var html = list.map(function (item) {
     var imageUrl = base + item.key;
     var downloadUrl = "/api/download-thumbnail?id=" + encodeURIComponent(videoId) + "&size=" + encodeURIComponent(item.key);
     return (
@@ -167,6 +176,21 @@ function parseBatchInput(text) {
   };
 }
 
+function getSelectedBatchSizes() {
+  if (!batchSizeGroup) {
+    return [];
+  }
+  var inputs = batchSizeGroup.querySelectorAll('input[type="checkbox"]');
+  var result = [];
+  for (var i = 0; i < inputs.length; i++) {
+    var inputEl = inputs[i];
+    if (inputEl && inputEl.checked && inputEl.value) {
+      result.push(inputEl.value);
+    }
+  }
+  return result;
+}
+
 function buildBatchStatusMessage(validCount, invalidCount) {
   if (validCount === 0 && invalidCount === 0) {
     return "";
@@ -212,7 +236,8 @@ function updateBatchPreview() {
       "Video " + (batchPreviewIndex + 1) + " of " + batchPreviewIds.length + " (ID: " + currentId + ")";
   }
 
-  renderThumbnailsInto(currentId, batchPreviewThumbnails);
+  var selectedSizes = getSelectedBatchSizes();
+  renderThumbnailsInto(currentId, batchPreviewThumbnails, selectedSizes);
 }
 
 function handleBatchPrevClick() {
@@ -267,7 +292,13 @@ function performZipDownloadForIds(idList, triggerButton) {
     return;
   }
 
-  var resolution = batchResolution && batchResolution.value ? batchResolution.value : "maxresdefault.jpg";
+  var sizes = getSelectedBatchSizes();
+  if (!sizes.length) {
+    batchStatus.textContent = "Please select at least one thumbnail size.";
+    return;
+  }
+
+  var resolution = sizes[0] || "maxresdefault.jpg";
   var fallback = batchFallback ? !!batchFallback.checked : true;
   var pattern = batchFileNamePattern && batchFileNamePattern.value ? batchFileNamePattern.value : "{index}-{id}-{size}.jpg";
 
@@ -290,6 +321,7 @@ function performZipDownloadForIds(idList, triggerButton) {
     body: JSON.stringify({
       items: items,
       resolution: resolution,
+      sizes: sizes,
       fallback: fallback,
       fileNamePattern: pattern
     })
