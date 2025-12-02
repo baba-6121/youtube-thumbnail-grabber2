@@ -520,11 +520,32 @@ body {
   }
 
   .url-input {
+    /* 解决高度和布局问题 */
+    display: block; 
     width: 100%;
-    padding: 0.9rem 1rem;
-    font-size: 1rem;
-    border: 2px solid #d1d5db;
-    border-radius: 0.75rem;
+    height: 2.5rem; 
+    line-height: 2.5rem; 
+    
+    /* 覆盖掉桌面端的高 padding，解决高度过高问题 */
+    padding: 0 0.9rem;
+    
+    /* 覆盖掉桌面端的边框/阴影，使用更轻量级的移动端风格 */
+    border-width: 1px;
+    border-color: #d1d5db; /* 移动端更浅的边框颜色 */
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05); /* 移动端更浅的阴影 */
+    
+    /* ❗️ 强制取消 flex 属性对高度的潜在影响 */
+    /* 在移动端改为 block，不再需要 flex 相关的拉伸行为 */
+    flex: none; 
+  }
+
+  .url-input:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 1px #4f46e5, 0 0 0 3px #e0e7ff;
+  }
+
+  #batch-input {
+    height: 6.25rem;
   }
 
   .primary-button {
