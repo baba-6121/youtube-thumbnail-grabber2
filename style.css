@@ -122,12 +122,27 @@ body {
   color: #4b5563;
   cursor: pointer;
   transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
 }
 
 .mode-tab.is-active {
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
   color: #f9fafb;
   box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+}
+
+.mode-tab-badge {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.1rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background-color: #ef4444;
+  color: #fef2f2;
 }
 
 .mode-panel {
@@ -162,9 +177,13 @@ body {
 .url-input {
   flex: 1 1 220px;
   min-width: 0;
-  padding: 0.7rem 0.9rem;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
+  padding: 0.85rem 1.1rem;
+  border-radius: 0.75rem;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #a5b4fc;
+  background-color: #f9fafb;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.09);
   font-size: 0.95rem;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -172,23 +191,11 @@ body {
 
 .url-input:focus {
   border-color: #4f46e5;
-  box-shadow: 0 0 0 1px #4f46e533, 0 0 0 4px #e0e7ff;
+  box-shadow: 0 0 0 1px #4f46e5, 0 0 0 5px #e0e7ff;
 }
 
-#video-url {
-  background-color: #f9fafb;
-  border-width: 2px;
-  border-color: #e5e7eb;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
-}
-
-#video-url::placeholder {
+.url-input::placeholder {
   color: #9ca3af;
-}
-
-#video-url:focus {
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 1px #4f46e5, 0 0 0 4px #e0e7ff;
 }
 
 .primary-button {
