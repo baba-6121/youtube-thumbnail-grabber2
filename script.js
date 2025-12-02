@@ -58,17 +58,18 @@ function buildThumbnails(videoId) {
     { key: "default.jpg", label: "Small Thumbnail", size: "120x90" }
   ];
   var html = sizes.map(function (item) {
-    var url = base + item.key;
+    var imageUrl = base + item.key;
+    var downloadUrl = "/api/download-thumbnail?id=" + encodeURIComponent(videoId) + "&size=" + encodeURIComponent(item.key);
     return (
       '<article class="thumbnail-card">' +
       '<div class="thumbnail-header">' +
       '<h3 class="thumbnail-title">' + item.label + ' Image (' + item.size + ")</h3>" +
       '<div class="thumbnail-actions">' +
-      '<a class="download-link" href="' + url + '" target="_blank" rel="noopener noreferrer" download>Download</a>' +
+      '<a class="download-link" href="' + downloadUrl + '">Download</a>' +
       "</div>" +
       "</div>" +
       '<div class="thumbnail-image-wrapper">' +
-      '<img class="thumbnail-image" src="' + url + '" alt="' + item.label + ' (' + item.size + ')" loading="lazy" />' +
+      '<img class="thumbnail-image" src="' + imageUrl + '" alt="' + item.label + ' (' + item.size + ')" loading="lazy" />' +
       "</div>" +
       "</article>"
     );
