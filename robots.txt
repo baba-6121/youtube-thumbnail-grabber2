@@ -1,0 +1,10 @@
+User-agent: *
+
+# Block serverless API endpoints from being crawled/indexed
+Disallow: /api/
+
+# Allow all other content
+Allow: /
+
+# Sitemap location
+Sitemap: https://youtube-thumbnail-grabber.online/sitemap.xml
