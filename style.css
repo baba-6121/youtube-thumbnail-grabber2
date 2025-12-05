@@ -475,6 +475,68 @@ body {
   text-decoration: underline;
 }
 
+.policy-article .primary-button,
+.policy-article .primary-button:visited {
+  color: #f9fafb;
+  text-decoration: none;
+}
+
+.policy-article table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25rem 0 1.75rem;
+  font-size: 0.9rem;
+}
+
+.policy-article thead th {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  background-color: #f9fafb;
+  color: #4b5563;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.policy-article tbody td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.policy-article tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.policy-article tbody tr:nth-child(2n) {
+  background-color: #f9fafb;
+}
+
+.policy-article h3 {
+  font-size: 0.98rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.45rem;
+}
+
+.policy-article code {
+  font-size: 0.85rem;
+  background-color: #f3f4f6;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.35rem;
+}
+
+.policy-article .section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.policy-article .section-title::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: linear-gradient(to right, #e5e7eb, transparent);
+  margin-left: 0.25rem;
+}
+
 @media (max-width: 720px) {
   .header-inner {
     flex-direction: column;
