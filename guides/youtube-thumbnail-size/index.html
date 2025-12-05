@@ -8,16 +8,48 @@
     name="description"
     content="Learn YouTube's recommended thumbnail size 1280x720 (16:9), file size limits and design tips to keep your thumbnails sharp on every device and improve click-through rate."
   />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/style.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Why does YouTube recommend 1280x720 instead of 1920x1080?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "YouTube recommends 1280x720 because it is the 720p HD standard, offering a good balance between sharpness, file size, and loading speed across devices."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "If I don't upload a custom thumbnail, what will YouTube use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "If you do not upload a custom thumbnail, YouTube automatically selects a few frames from your video and lets you pick one, which often does not represent the main idea of the content."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I use a GIF as my thumbnail?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can upload a GIF file as a thumbnail, but it will be displayed as a static image and not as an animated GIF in YouTube results or on the watch page."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <header class="site-header">
     <div class="container header-inner">
       <div class="logo">Download YouTube Thumbnails</div>
       <nav class="nav-links">
-        <a href="index.html" class="nav-link">Home</a>
-        <a href="youtube-thumbnail-size.html" class="nav-link is-current">Posts</a>
-        <a href="privacy-policy.html" class="nav-link">Privacy Policy</a>
+        <a href="/" class="nav-link">Home</a>
+        <a href="/guides/youtube-thumbnail-size/" class="nav-link is-current">Posts</a>
+        <a href="/privacy-policy/" class="nav-link">Privacy Policy</a>
         <a href="mailto:feedback@youtube-thumbnail-grabber.online" class="nav-link">Contact</a>
       </nav>
     </div>
@@ -110,11 +142,19 @@
           <li><strong>Short text:</strong> keep copy under about 6 words and use large, bold fonts.</li>
           <li><strong>Visual punch:</strong> use saturated colors and clear composition to guide the viewer's eye.</li>
         </ul>
+        <p>
+          For a deeper checklist on layout, color and branding, see our
+          <a href="/guides/youtube-thumbnail/design-tips/">YouTube thumbnail design tips</a> guide.
+        </p>
 
         <h3>Optimize thumbnail filenames for SEO</h3>
         <p>
           Before you upload, rename the file to a descriptive name that includes your main keyword, for example:
           <code>youtube-thumbnail-size-guide-1280x720.jpg</code>.
+        </p>
+        <p>
+          To learn more ways to increase click-through rate with better thumbnails, read
+          <a href="/guides/youtube-thumbnail/improve-ctr/">how to improve YouTube thumbnail CTR</a>.
         </p>
 
         <h2 class="section-title">❓ Frequently asked questions (FAQ section)</h2>
@@ -155,6 +195,6 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="/script.js"></script>
 </body>
 </html>
